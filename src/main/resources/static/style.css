@@ -1,0 +1,28 @@
+/* Apply green color to all elements */
+* {
+  color: green;
+}
+
+
+
+/* Apply green border to all images */
+img {
+  border: 2px solid green;
+}
+
+/* Apply green color to all headings */
+h1, h2, h3, h4, h5, h6 {
+  color: green;
+}
+
+/* Apply green color to all links */
+a {
+  color: blue;
+  text-decoration: none;
+}
+
+/* Apply green hover color to all links */
+a:hover {
+  color: lightgreen;
+}
+
