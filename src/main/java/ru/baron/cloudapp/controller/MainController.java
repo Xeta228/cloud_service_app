@@ -60,7 +60,7 @@ public class MainController {
         }
         return "redirect:/files";
     }
-
+   // http://localhost:8080/files/images.jpeg
     @GetMapping("/files/{file}")
     public ResponseEntity<byte[]> downloadFile(@PathVariable File file){
         try {
@@ -69,7 +69,7 @@ public class MainController {
             headers.setContentDisposition(ContentDisposition.attachment().filename(file.getName()).build());
             return ResponseEntity.ok().headers(headers).body(fileContent);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return ResponseEntity.notFound().build();
         }
     }
 }
