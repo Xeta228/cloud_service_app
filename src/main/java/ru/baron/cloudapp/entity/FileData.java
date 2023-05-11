@@ -1,9 +1,6 @@
 package ru.baron.cloudapp.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,10 +13,13 @@ public class FileData {
     private Long id;
     private String name;
     private String path;
+    @ManyToOne(fetch=FetchType.EAGER)
+    @JoinColumn(name="user_id")
+    private User user;
 
-
-    public FileData(String name, String path) {
+    public FileData(String name, String path, User user) {
         this.name = name;
         this.path = path;
+        this.user = user;
     }
 }

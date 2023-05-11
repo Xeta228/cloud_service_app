@@ -8,7 +8,7 @@ import java.util.List;
 @Service
 public class FileDataService {
 
-    FileDataRepository repository;
+    private FileDataRepository repository;
 
     public FileDataService(FileDataRepository repository) {
         this.repository = repository;
@@ -18,7 +18,9 @@ public class FileDataService {
         return repository.findAll();
     }
 
-
+    public List<FileData> findAllByUserId(Long id){
+        return repository.findAllByUserId(id);
+    }
     public void save(FileData fileData) {
         repository.save(fileData);
     }

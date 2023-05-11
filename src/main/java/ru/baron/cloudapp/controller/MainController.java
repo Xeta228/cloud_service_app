@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import ru.baron.cloudapp.entity.FileData;
+import ru.baron.cloudapp.entity.User;
 import ru.baron.cloudapp.service.FileDataService;
 
 import java.io.File;
@@ -36,14 +38,15 @@ public class MainController {
     }
 
     @GetMapping("/files")
-    public String resolveFilesPage(Model model){
-        List<FileData> files = service.findAll();
+    public String resolveFilesPage(Model model, @AuthenticationPrincipal User user){
+        List<FileData> files = service.findAllByUserId(user.getId());
         model.addAttribute("files",files);
+        model.addAttribute("username",user.getUsername());
         return "files";
     }
 
     @PostMapping("/files")
-    public String uploadFile(@RequestParam("file") MultipartFile file){
+    public String uploadFile(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal User user){
         //later implement the logics that if a file is not choosen just return error through binding result.
         if(file.isEmpty()) return "redirect:/files";
         try {
@@ -53,7 +56,7 @@ public class MainController {
             }
             file.transferTo(new File(UPLOAD_PATH + "/" + file.getOriginalFilename()));
             FileData fileData = new FileData(file.getOriginalFilename(),UPLOAD_PATH + "/"
-                    + file.getOriginalFilename());
+                    + file.getOriginalFilename(), user);
             service.save(fileData);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -69,6 +72,7 @@ public class MainController {
             headers.setContentDisposition(ContentDisposition.attachment().filename(file.getName()).build());
             return ResponseEntity.ok().headers(headers).body(fileContent);
         } catch (IOException e) {
+            //make this look prettier in the future with custom 404 page
             return ResponseEntity.notFound().build();
         }
     }
