@@ -1,6 +1,9 @@
 package ru.baron.cloudapp.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,7 +21,14 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotEmpty(message = "login cannot be empty")
+    @Size(min = 2, max = 30, message = "login shouldn't be shorted than 2 and longer than 30 characters")
+    @Pattern(regexp = "^\\S+$", message = "login cannot contain space characters")
     private String login;
+
+    @NotEmpty(message = "password cannot be empty")
+    @Size(min = 4, max = 100, message= "password shouldn't be shorted than 4 and longer than 100 characters")
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -85,7 +85,9 @@
 <h1>All files - <span th:text="${username}"></span></h1>
 <form method="post" enctype="multipart/form-data" action="/files">
     <input type="file" name="file">
-    <br><br>
+ <br>
+    <div  style="color:red" th:if="${fileIsEmptyError}" th:text="${fileIsEmptyError}"/>
+ <br>
     <button class="upload-button" type="submit">Upload</button>
 </form>
 <table>

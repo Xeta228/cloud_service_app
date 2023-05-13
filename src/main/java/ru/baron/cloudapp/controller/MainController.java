@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.baron.cloudapp.entity.FileData;
 import ru.baron.cloudapp.entity.User;
 import ru.baron.cloudapp.service.FileDataService;
@@ -40,15 +41,24 @@ public class MainController {
     @GetMapping("/files")
     public String resolveFilesPage(Model model, @AuthenticationPrincipal User user){
         List<FileData> files = service.findAllByUserId(user.getId());
+//        if(model.containsAttribute("fileIsEmptyError")){
+//           // String errorMessage = (String) model.getAttribute("fileIsEmptyError");
+//          //  model.addAttribute("fileIsEmptyError",model.getAttribute("fileIsEmptyError"));
+//        }
         model.addAttribute("files",files);
         model.addAttribute("username",user.getUsername());
         return "files";
     }
 
     @PostMapping("/files")
-    public String uploadFile(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal User user){
-        //later implement the logics that if a file is not choosen just return error through binding result.
-        if(file.isEmpty()) return "redirect:/files";
+    public String uploadFile(@RequestParam(value = "file") MultipartFile file
+                            , @AuthenticationPrincipal User user,
+                             RedirectAttributes redirectAttributes){
+        if(file.isEmpty()) {
+            redirectAttributes.addFlashAttribute("fileIsEmptyError"
+                    ,"the file you are submitting cannot be empty");
+            return "redirect:/files";
+        }
         try {
             File uploadDir = new File(UPLOAD_PATH);
             if(!uploadDir.exists()){

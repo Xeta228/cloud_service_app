@@ -55,6 +55,13 @@
         button[type="submit"]:hover {
             background-color: #006400;
         }
+
+        .custom-error {
+      color: red;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
     </style>
 </head>
 <body>
@@ -63,19 +70,28 @@
   <div th:if="${param.error}">
     <p class="error">Error occurred during registration.</p>
   </div>
-  <form th:action="@{/registration}" method="post">
+  <form th:action="@{/registration}" method="post" th:object="${user}">
     <div>
-      <label for="username">Username:</label>
-      <input type="text" id="username" name="username" required autofocus />
+      <label for="login">Login:</label>
+      <input type="text" id="login" name="login" required autofocus />
+      <div style="color:red" th:if="${#fields.hasErrors('login')}" th:errors="*{login}">Login error</div>
     </div>
     <div>
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" required />
+      <div style="color:red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password error</div>
     </div>
     <div>
       <label for="confirmPassword">Confirm Password:</label>
-      <input type="password" id="confirmPassword" name="confirmPassword" required />
+      <input  type="password" id="confirmPassword" name="confirmPassword" required />
+      <div  style="color:red" th:if="${confirmPasswordError}" th:text="${confirmPasswordError}">
+        Confirm password error</div>
+
     </div>
+    <div th:if="${userExistsError}" class="custom-error">
+      <p th:text="${userExistsError}"></p>
+    </div>
+
     <div>
       <button type="submit">Register</button>
     </div>
