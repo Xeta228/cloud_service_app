@@ -1,5 +1,6 @@
 package ru.baron.cloudapp.controller;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -41,12 +42,10 @@ public class MainController {
     @GetMapping("/files")
     public String resolveFilesPage(Model model, @AuthenticationPrincipal User user){
         List<FileData> files = service.findAllByUserId(user.getId());
-//        if(model.containsAttribute("fileIsEmptyError")){
-//           // String errorMessage = (String) model.getAttribute("fileIsEmptyError");
-//          //  model.addAttribute("fileIsEmptyError",model.getAttribute("fileIsEmptyError"));
-//        }
         model.addAttribute("files",files);
         model.addAttribute("username",user.getUsername());
+        Double totalFileSize = files.stream().mapToDouble(FileData::getSize).sum();
+        model.addAttribute("totalsize",totalFileSize);
         return "files";
     }
 
@@ -64,11 +63,30 @@ public class MainController {
             if(!uploadDir.exists()){
                 uploadDir.mkdir();
             }
+
             file.transferTo(new File(UPLOAD_PATH + "/" + file.getOriginalFilename()));
             FileData fileData = new FileData(file.getOriginalFilename(),UPLOAD_PATH + "/"
-                    + file.getOriginalFilename(), user);
-            service.save(fileData);
+                    + file.getOriginalFilename(), user,(double)file.getSize()/1024);
+
+            FileData fileFromDb = service.findByName(fileData.getName());
+
+            //ADD NOTIFICATION THAT FILE WILL BE UPDATED
+            //ask user
+            if(fileFromDb!=null){
+                service.updateFileData(fileData);
+                redirectAttributes.addFlashAttribute("fileUpdateWarning"
+                        ,"the file already exists. It has been updated");
+            }
+
+            else {
+                service.save(fileData);
+            }
+
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         return "redirect:/files";

@@ -8,6 +8,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.baron.cloudapp.entity.FileData;
 import ru.baron.cloudapp.entity.User;
 import ru.baron.cloudapp.service.UserService;
 import ru.baron.cloudapp.util.ControllerUtils;
@@ -41,11 +42,10 @@ public class RegistrationController {
         }
         if(!user.getPassword().equals(confirmPassword)){
             model.addAttribute("confirmPasswordError","passwords should match");
-            System.out.println("Password confirm error");
             return "registration";
         }
        // User user = new User(username, password);
-        userService.save(user);
+
         return "login";
     }
 

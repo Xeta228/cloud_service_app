@@ -1,20 +1,22 @@
 package ru.baron.cloudapp.entity;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 
 @Entity(name = "usr")
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 public class User implements UserDetails {
 
@@ -31,6 +33,7 @@ public class User implements UserDetails {
     @Size(min = 4, max = 100, message= "password shouldn't be shorted than 4 and longer than 100 characters")
     private String password;
 
+    //changed type from EAGER TO LAZY
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<FileData> files;
 
@@ -68,4 +71,30 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+//    @Override
+//    public String toString() {
+//        return "User{" +
+//                "id=" + id +
+//                ", login='" + login + '\'' +
+//                ", password='" + password + '\'' +
+//                ", files=" + files +
+//                '}';
+//    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id) && Objects.equals(login, user.login)
+                && Objects.equals(password, user.password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, login, password);
+    }
+
+
 }

@@ -7,4 +7,10 @@ import java.util.List;
 
 public interface FileDataRepository extends JpaRepository<FileData, Long> {
     List<FileData> findAllByUserId(Long userId);
+
+    void deleteByName(String name);
+
+    FileData findByName(String name);
+
+
 }
