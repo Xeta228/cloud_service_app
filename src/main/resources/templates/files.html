@@ -107,7 +107,7 @@
     <tr th:each="file : ${files}">
         <td th:text="${file.name}"></td>
         <td th:text="${#numbers.formatDecimal(file.size, 0, 'COMMA', 2, 'POINT')} + ' Kb'"></td>
-        <td><a th:href="@{'/files/' + ${file.name}}">Download</a></td>
+        <td><a th:href="@{'/files/' + ${file.id}}">Download</a></td>
 
     </tr>
     </tbody>

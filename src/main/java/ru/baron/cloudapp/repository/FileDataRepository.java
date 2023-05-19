@@ -12,5 +12,7 @@ public interface FileDataRepository extends JpaRepository<FileData, Long> {
 
     FileData findByName(String name);
 
+    List<FileData> findAllByUserLogin(String login);
 
+    //FileData findById(Long id);
 }

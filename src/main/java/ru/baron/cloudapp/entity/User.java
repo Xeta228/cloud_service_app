@@ -34,7 +34,7 @@ public class User implements UserDetails {
     private String password;
 
     //changed type from EAGER TO LAZY
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<FileData> files;
 
     @Override

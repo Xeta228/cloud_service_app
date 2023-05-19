@@ -59,20 +59,19 @@ public class MainController {
             return "redirect:/files";
         }
         try {
-            File uploadDir = new File(UPLOAD_PATH);
+            String pathToUpload = UPLOAD_PATH + '/' + user.getId();
+            File uploadDir = new File(pathToUpload);
             if(!uploadDir.exists()){
                 uploadDir.mkdir();
             }
 
-            file.transferTo(new File(UPLOAD_PATH + "/" + file.getOriginalFilename()));
-            FileData fileData = new FileData(file.getOriginalFilename(),UPLOAD_PATH + "/"
+            file.transferTo(new File(pathToUpload + "/" + file.getOriginalFilename()));
+            FileData fileData = new FileData(file.getOriginalFilename(),pathToUpload + "/"
                     + file.getOriginalFilename(), user,(double)file.getSize()/1024);
 
-            FileData fileFromDb = service.findByName(fileData.getName());
-
-            //ADD NOTIFICATION THAT FILE WILL BE UPDATED
-            //ask user
-            if(fileFromDb!=null){
+            //Bug where file of other user is replaced
+            List<FileData> filesFromDb = service.findAllByUserLogin(user.getLogin());
+            if(filesFromDb.contains(fileData)){
                 service.updateFileData(fileData);
                 redirectAttributes.addFlashAttribute("fileUpdateWarning"
                         ,"the file already exists. It has been updated");
@@ -81,26 +80,23 @@ public class MainController {
             else {
                 service.save(fileData);
             }
-
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         return "redirect:/files";
     }
    // http://localhost:8080/files/images.jpeg
-    @GetMapping("/files/{file}")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable File file){
+    @GetMapping("/files/{id}")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable Long id){
+
+
         try {
-            byte[] fileContent = Files.readAllBytes(Paths.get(UPLOAD_PATH + "/" + file.getName()));
+            FileData file = service.findById(id);
+            byte[] fileContent = Files.readAllBytes(Paths.get(file.getPath()));
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentDisposition(ContentDisposition.attachment().filename(file.getName()).build());
+            headers.setContentDisposition(ContentDisposition.attachment().filename(file.getPath()).build());
             return ResponseEntity.ok().headers(headers).body(fileContent);
         } catch (IOException e) {
-            //make this look prettier in the future with custom 404 page
             return ResponseEntity.notFound().build();
         }
     }

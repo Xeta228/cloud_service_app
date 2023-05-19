@@ -41,10 +41,17 @@ public class FileDataService {
 
 
     @Transactional
-    public void updateFileData(FileData fileData) throws InterruptedException {
+    public void updateFileData(FileData fileData) {
         repository.delete(fileData);
-        repository.save(fileData);
+      //  repository.save(fileData);
     }
 
+    public List<FileData> findAllByUserLogin(String login){
+        return repository.findAllByUserLogin(login);
+    }
 
+    public FileData findById(Long id){
+        //TODO implement exception
+        return repository.findById(id).get();
+    }
 }
