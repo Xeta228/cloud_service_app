@@ -87,16 +87,20 @@ public class MainController {
     }
    // http://localhost:8080/files/images.jpeg
     @GetMapping("/files/{id}")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable Long id){
+    public ResponseEntity<byte[]> downloadFile(@PathVariable Long id, @AuthenticationPrincipal User user){
+        FileData file = service.findById(id);
+        if(user.equals(file.getUser())) {
+            try {
 
-
-        try {
-            FileData file = service.findById(id);
-            byte[] fileContent = Files.readAllBytes(Paths.get(file.getPath()));
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentDisposition(ContentDisposition.attachment().filename(file.getPath()).build());
-            return ResponseEntity.ok().headers(headers).body(fileContent);
-        } catch (IOException e) {
+                byte[] fileContent = Files.readAllBytes(Paths.get(file.getPath()));
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentDisposition(ContentDisposition.attachment().filename(file.getPath()).build());
+                return ResponseEntity.ok().headers(headers).body(fileContent);
+            } catch (IOException e) {
+                return ResponseEntity.notFound().build();
+            }
+        }
+        else{
             return ResponseEntity.notFound().build();
         }
     }
